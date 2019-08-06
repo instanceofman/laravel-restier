@@ -195,6 +195,19 @@ class Package
         }
     }
 
+    protected function executeFormatter($value, $processor)
+    {
+        if (is_string($processor)) {
+            return $processor($value);
+        } else if ($processor instanceof Closure) {
+            return $processor($value);
+        } else if (is_callable($processor)) {
+            return is_array($processor) ? call_user_func($processor, $value) : $processor($value);
+        } else {
+            throw new InvalidArgumentException();
+        }
+    }
+
     public function then($processor)
     {
         if (!$this->isSuccess()) {
@@ -215,5 +228,18 @@ class Package
         $this->executeProcessorOnError($processor);
 
         return $this;
+    }
+
+    public function format($processor)
+    {
+        return $this->executeFormatter($this->getData(), $processor);
+    }
+
+    public function formatField($field, $processor)
+    {
+        return $this->executeFormatter(
+            $this->getData($field),
+            $processor
+        );
     }
 }
