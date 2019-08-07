@@ -72,6 +72,13 @@ class Restier implements HttpMethods
         );
     }
 
+    public function json(string $method, string $url, $data = [], $headers = [], $options = [])
+    {
+        $headers = array_merge($headers, ['Content-Type' => 'application/json']);
+        $data = json_encode($data);
+        return \Requests::request($url, $headers, $data, $method, $options);
+    }
+
     protected function resolveRequest(\Requests_Response $request, $args): Package
     {
         return (new Package($request))->attachPayload($args['data'] ?? []);
